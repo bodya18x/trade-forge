@@ -1,0 +1,5 @@
+alembic==1.14.0
+pydantic==2.9.2
+pydantic-settings==2.6.1
+clickhouse-connect==0.8.13
+PyYAML==6.0.2

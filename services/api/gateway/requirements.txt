@@ -1,0 +1,27 @@
+# Core Framework
+fastapi==0.116.1
+uvicorn[standard]==0.35.0
+pydantic[email]==2.9.2
+pydantic-settings==2.6.1
+
+# Database (Async)
+sqlalchemy[asyncio]==2.0.36
+asyncpg==0.30.0
+
+# Cache
+redis==5.0.5
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1  # Фиксируем версию для совместимости с passlib 1.7.4
+
+# HTTP Client
+httpx==0.27.0
+
+# Observability
+structlog==25.4.0
+
+# GeoIP & Device Detection
+geoip2==4.8.1
+user-agents==2.2.0

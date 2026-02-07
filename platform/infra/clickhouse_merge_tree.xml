@@ -1,0 +1,15 @@
+<clickhouse>
+    <merge_tree>
+        <!-- Стандартный лимит -->
+        <max_suspicious_broken_parts>100</max_suspicious_broken_parts>
+
+        <!-- Оптимизация -->
+        <max_parts_in_total>2000</max_parts_in_total>
+        <parts_to_delay_insert>300</parts_to_delay_insert>
+        <parts_to_throw_insert>600</parts_to_throw_insert>
+
+        <!-- Автоматическая оптимизация партиций -->
+        <merge_max_block_size>8192</merge_max_block_size>
+        <max_bytes_to_merge_at_max_space_in_pool>150000000000</max_bytes_to_merge_at_max_space_in_pool>
+    </merge_tree>
+</clickhouse>

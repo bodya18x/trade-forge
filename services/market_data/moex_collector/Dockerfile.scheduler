@@ -1,0 +1,26 @@
+FROM trade-forge-base:latest
+
+# Устанавливаем cron (специфично для scheduler)
+RUN apt-get update && apt-get install -y cron && rm -rf /var/lib/apt/lists/*
+
+# Устанавливаем зависимости сервиса
+COPY ./requirements.txt requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Копируем код сервиса
+COPY . .
+
+ADD scripts/ /scripts
+
+RUN set -eux; \
+        chmod -R 0700 /scripts
+
+# Делаем права на файлы крон
+RUN set -eux; \
+    chmod -R 0700 /scripts
+
+# Регистрируем наш cron-файл
+RUN crontab /scripts/crontab
+
+# Запускаем cron в форграунде
+CMD ["cron", "-f"]

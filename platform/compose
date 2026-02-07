@@ -1,0 +1,26 @@
+#!/bin/bash
+
+if [[ $1 == 'start' ]]
+then
+    echo "Building BASE IMAGE"
+    docker build -t trade-forge-base:latest ../libs/core/
+
+    echo "Starting INFRA services"
+    comm="--build-arg CACHEBUST=$RANDOM"
+    docker-compose -f docker-compose.infra.yml -p infra build --no-cache $comm
+    docker-compose -f docker-compose.infra.yml -p infra up -d
+
+    echo "Starting APPLICATION services"
+    comm="--build-arg CACHEBUST=$RANDOM"
+    docker-compose -f docker-compose.app.yml -p services build --no-cache $comm
+    docker-compose -f docker-compose.app.yml -p services up -d
+elif [[ $1 == 'down' ]]
+then
+    echo "Removing APPLICATION services"
+    docker-compose -f docker-compose.app.yml -p services down
+
+    echo "Removing INFRA services"
+    docker-compose -f docker-compose.infra.yml -p infra down
+else
+    echo "Got a non-existent command"
+fi

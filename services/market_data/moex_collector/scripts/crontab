@@ -1,0 +1,54 @@
+# Конфигурация Crontab для MOEX Collector
+#
+# Вызывает планировщик через CLI для создания задач на сбор данных.
+# Планировщик получает активные тикеры для указанного рынка и отправляет задачи в Kafka.
+#
+# Аргументы: <timeframe> [market_code] [--sync-redis]
+# По умолчанию market_code: moex_stock
+
+# Выполнить задачи при старте системы (однократно)
+@reboot /scripts/schedule_candles.sh 10min moex_stock >> /var/log/cron.log 2>&1
+@reboot /scripts/schedule_candles.sh 1h moex_stock >> /var/log/cron.log 2>&1
+@reboot /scripts/schedule_candles.sh 1d moex_stock >> /var/log/cron.log 2>&1
+@reboot /scripts/schedule_candles.sh 1w moex_stock >> /var/log/cron.log 2>&1
+@reboot /scripts/schedule_candles.sh 1m moex_stock >> /var/log/cron.log 2>&1
+
+# # 1min (каждую минуту) - закомментировано, включить при необходимости
+# * * * * * /scripts/schedule_candles.sh 1min moex_stock >> /var/log/cron.log 2>&1
+
+# 10min (каждые 10 минут в точные интервалы) - АКЦИИ
+0,10,20,30,40,50 * * * * /scripts/schedule_candles.sh 10min moex_stock >> /var/log/cron.log 2>&1
+
+# 1h (каждый час на 1-й минуте) - АКЦИИ
+# Синхронизирует состояние Redis с ClickHouse
+1 * * * * /scripts/schedule_candles.sh 1h moex_stock --sync-redis >> /var/log/cron.log 2>&1
+
+# 1d (ежедневно в 00:10) - АКЦИИ
+10 0 * * * /scripts/schedule_candles.sh 1d moex_stock >> /var/log/cron.log 2>&1
+
+# 1w (еженедельно по понедельникам в 00:10) - АКЦИИ
+10 0 * * 1 /scripts/schedule_candles.sh 1w moex_stock >> /var/log/cron.log 2>&1
+
+# 1m (ежемесячно 1-го числа в 00:10) - АКЦИИ
+10 0 1 * * /scripts/schedule_candles.sh 1m moex_stock >> /var/log/cron.log 2>&1
+
+# ==============================================================================
+# БУДУЩЕЕ: Раскомментировать и настроить для дополнительных рынков
+# ==============================================================================
+
+# # ФЬЮЧЕРСЫ - Пример конфигурации
+# # 10min (каждые 10 минут)
+# # 0,10,20,30,40,50 * * * * /scripts/schedule_candles.sh 10min moex_futures >> /var/log/cron.log 2>&1
+#
+# # 1h (каждый час на 2-й минуте)
+# # 2 * * * * /scripts/schedule_candles.sh 1h moex_futures --sync-redis >> /var/log/cron.log 2>&1
+#
+# # 1d (ежедневно в 00:15)
+# # 15 0 * * * /scripts/schedule_candles.sh 1d moex_futures >> /var/log/cron.log 2>&1
+
+# # ВАЛЮТЫ - Пример конфигурации
+# # 1h (каждый час на 3-й минуте)
+# # 3 * * * * /scripts/schedule_candles.sh 1h moex_currency --sync-redis >> /var/log/cron.log 2>&1
+#
+# # 1d (ежедневно в 00:20)
+# # 20 0 * * * /scripts/schedule_candles.sh 1d moex_currency >> /var/log/cron.log 2>&1

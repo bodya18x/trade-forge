@@ -1,0 +1,65 @@
+# ===================================================================
+#      TRADE FORGE - KAFKA TOPICS DEFINITIONS
+# ===================================================================
+#
+# Этот файл является единственным источником правды для всех топиков Kafka в системе.
+#
+# Параметры:
+#   partitions: количество партиций
+#   replication: фактор репликации (для локальной разработки всегда 1)
+#   config: дополнительные параметры топика
+#
+# ===================================================================
+
+topics:
+  # --- Data Ingestion Pipeline ---
+  - name: trade-forge.marketdata.candles.raw.v1
+    partitions: 16
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "604800000" # 7 дней
+
+  - name: trade-forge.market-collectors.request
+    partitions: 16
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "86400000" # 1 день
+
+  - name: trade-forge.market-collectors.tasks
+    partitions: 16
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "86400000" # 1 день
+
+  # --- Indicator Calculation Pipeline ---
+  - name: trade-forge.indicators.candles.processed.rt.v1
+    partitions: 8
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "604800000" # 7 дней
+
+  - name: trade-forge.backtesting.indicators.calculation-requested.v1
+    partitions: 4
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "259200000" # 3 дня
+
+  # --- Trading Engine Pipeline ---
+  - name: trade-forge.backtests.requests.v1
+    partitions: 2
+    replication: 1
+    config:
+      "cleanup.policy": "delete"
+      "retention.ms": "259200000" # 3 дня
+
+  - name: trade-forge.trading.orders.v1
+    partitions: 1 # Для реальной торговли важен порядок
+    replication: 1
+    config:
+      "cleanup.policy": "compact,delete" # Сохраняем последнее состояние + удаляем старое
+      "retention.ms": "-1" # Бесконечное хранение

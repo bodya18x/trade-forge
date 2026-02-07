@@ -1,0 +1,114 @@
+# ===================================================================
+#                   TRADE FORGE - MAIN DOCKER COMPOSE
+# ===================================================================
+#
+# Запуск:     docker-compose -f docker-compose.app.yml -p services up --build -d
+# Остановка:  docker-compose -f docker-compose.app.yml down
+# Перезапуск: docker-compose -f docker-compose.app.yml -p services up --build --force-recreate -d <СЕРВИС>
+#
+# ===================================================================
+services:
+
+  # -------------------------------------------------------------------
+  # БЛОК: СЕРВИСЫ ПРИЛОЖЕНИЯ
+  # -------------------------------------------------------------------
+
+  # -- Домен: Аналитика (Калькуляция индикаторов) --
+  data-processor-rt:
+    build:
+      context: ../services/analytics/data_processor
+    deploy:
+      replicas: 2
+    environment:
+      RUN_ARG: realtime
+    env_file:
+      - ./.env
+      - ../services/analytics/data_processor/.env
+    networks:
+      - shared_network
+
+  data-processor-batch:
+    build:
+      context: ../services/analytics/data_processor
+    deploy:
+      replicas: 2
+    environment:
+      RUN_ARG: batch
+    env_file:
+      - ./.env
+      - ../services/analytics/data_processor/.env
+    networks:
+      - shared_network
+
+  # -- Домен: Торговое ядро --
+  trading-engine:
+    build:
+      context: ../services/trading_core/trading_engine
+    container_name: trading-engine
+    deploy:
+      replicas: 1
+    env_file:
+      - ./.env
+      - ../services/trading_core/trading_engine/.env
+    networks:
+      - shared_network
+
+  # -- Домен: Сбор рыночных данных --
+  moex-collector-scheduler:
+    build:
+      context: ../services/market_data/moex_collector
+      dockerfile: Dockerfile.scheduler
+    container_name: moex-collector-scheduler
+    env_file:
+      - ./.env
+      - ../services/market_data/moex_collector/.env
+    networks:
+      - shared_network
+
+  moex-collector-consumer:
+    build:
+      context: ../services/market_data/moex_collector
+      dockerfile: Dockerfile.consume
+    deploy:
+      replicas: 4
+    env_file:
+      - ./.env
+      - ../services/market_data/moex_collector/.env
+    networks:
+      - shared_network
+
+  internal-api:
+    build:
+      context: ../services/api/internal
+    ports:
+      - "8001:8000"
+    deploy:
+      replicas: 1
+    env_file:
+      - ./.env
+      - ../services/api/internal/.env
+    volumes:
+      - ./platform/migrator/indicators/data/indicators.json:/app/data/indicators.json:ro
+    networks:
+      - shared_network
+
+  gateway:
+    build:
+      context: ../services/api/gateway
+      args:
+        MAXMIND_LICENSE_KEY: ${MAXMIND_LICENSE_KEY}
+    container_name: gateway
+    ports:
+      - "8002:8000"
+    deploy:
+      replicas: 1
+    env_file:
+      - ./.env
+      - ../services/api/gateway/.env
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    driver: host
+    external: true

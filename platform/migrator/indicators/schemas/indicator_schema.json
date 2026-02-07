@@ -1,0 +1,177 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "title": "System Indicator Definition Schema",
+  "description": "JSON Schema для описания системных индикаторов Trade Forge",
+  "required": [
+    "name",
+    "display_name",
+    "category",
+    "complexity",
+    "parameters_schema",
+    "output_schema",
+    "key_template"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "maxLength": 50,
+      "description": "Уникальное имя семейства индикаторов (snake_case)",
+      "examples": ["sma", "rsi", "macd", "supertrend"]
+    },
+    "display_name": {
+      "type": "string",
+      "maxLength": 100,
+      "description": "Человекочитаемое название для фронтенда",
+      "examples": ["Simple Moving Average", "Relative Strength Index", "SuperTrend"]
+    },
+    "description": {
+      "type": "string",
+      "description": "Подробное описание индикатора для пользователей"
+    },
+    "category": {
+      "type": "string",
+      "enum": ["trend", "momentum", "volatility", "volume", "oscillator", "support_resistance"],
+      "description": "Категория индикатора"
+    },
+    "complexity": {
+      "type": "string",
+      "enum": ["basic", "intermediate", "advanced"],
+      "description": "Уровень сложности индикатора"
+    },
+    "parameters_schema": {
+      "type": "object",
+      "description": "JSON Schema параметров индикатора",
+      "required": ["type", "properties"],
+      "properties": {
+        "type": {
+          "const": "object"
+        },
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "properties": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9_]*$": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "enum": ["integer", "number", "boolean", "string"]
+                },
+                "minimum": {
+                  "type": "number"
+                },
+                "maximum": {
+                  "type": "number"
+                },
+                "default": {},
+                "description": {
+                  "type": "string"
+                },
+                "enum": {
+                  "type": "array"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "description": "Схема выходных значений индикатора",
+      "required": ["type", "properties"],
+      "properties": {
+        "type": {
+          "const": "object"
+        },
+        "properties": {
+          "type": "object",
+          "patternProperties": {
+            "^[a-zA-Z][a-zA-Z0-9_]*$": {
+              "type": "object",
+              "required": ["type", "description"],
+              "properties": {
+                "type": {
+                  "enum": ["number", "boolean", "integer"]
+                },
+                "description": {
+                  "type": "string"
+                },
+                "range": {
+                  "type": "object",
+                  "properties": {
+                    "min": {
+                      "type": "number"
+                    },
+                    "max": {
+                      "type": "number"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "key_template": {
+      "type": "string",
+      "maxLength": 200,
+      "description": "Шаблон для генерации indicator_key с плейсхолдерами в фигурных скобках",
+      "examples": [
+        "{name}_timeperiod_{timeperiod}_value",
+        "{name}_length_{length}_multiplier_{multiplier}_{output_key}"
+      ]
+    },
+    "is_enabled": {
+      "type": "boolean",
+      "default": true,
+      "description": "Доступен ли индикатор для использования"
+    },
+    "frontend_config": {
+      "type": "object",
+      "description": "Дополнительная конфигурация для фронтенда",
+      "properties": {
+        "icon": {
+          "type": "string",
+          "description": "Иконка индикатора"
+        },
+        "color": {
+          "type": "string",
+          "pattern": "^#[0-9A-Fa-f]{6}$",
+          "description": "Цвет по умолчанию в hex формате"
+        },
+        "chart_type": {
+          "type": "string",
+          "enum": ["line", "area", "histogram", "overlay"],
+          "description": "Тип отображения на графике"
+        },
+        "parameter_groups": {
+          "type": "array",
+          "description": "Группировка параметров в UI",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "parameters": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

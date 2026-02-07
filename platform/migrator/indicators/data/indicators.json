@@ -1,0 +1,538 @@
+[
+  {
+    "name": "sma",
+    "display_name": "Simple Moving Average",
+    "description": "Простое скользящее среднее вычисляется как среднее арифметическое цен закрытия за определенный период. Используется для сглаживания колебаний цены и определения направления тренда.",
+    "category": "trend",
+    "complexity": "basic",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 200,
+          "default": 20,
+          "description": "Период для расчета скользящего среднего"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение простого скользящего среднего"
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "trending-up",
+      "color": "#2196F3",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "ema",
+    "display_name": "Exponential Moving Average",
+    "description": "Экспоненциальное скользящее среднее придает больший вес недавним ценам, что делает его более чувствительным к изменениям цены по сравнению с простым скользящим средним.",
+    "category": "trend",
+    "complexity": "basic",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 200,
+          "default": 20,
+          "description": "Период для расчета экспоненциального скользящего среднего"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение экспоненциального скользящего среднего"
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "trending-up",
+      "color": "#FF9800",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "rsi",
+    "display_name": "Relative Strength Index",
+    "description": "Индекс относительной силы измеряет скорость и изменение ценовых движений. RSI колеблется между 0 и 100, где значения выше 70 обычно считаются зоной перекупленности, а ниже 30 - зоной перепроданности.",
+    "category": "momentum",
+    "complexity": "basic",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 50,
+          "default": 14,
+          "description": "Период для расчета RSI"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение индекса относительной силы (0-100)",
+          "range": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "activity",
+      "color": "#9C27B0",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "macd",
+    "display_name": "Moving Average Convergence/Divergence",
+    "description": "MACD показывает связь между двумя скользящими средними цены актива. Состоит из линии MACD, сигнальной линии и гистограммы. Используется для определения тренда и моментума.",
+    "category": "momentum",
+    "complexity": "intermediate",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["fastperiod", "slowperiod", "signalperiod"],
+      "properties": {
+        "fastperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 50,
+          "default": 12,
+          "description": "Период быстрого экспоненциального скользящего среднего"
+        },
+        "slowperiod": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 100,
+          "default": 26,
+          "description": "Период медленного экспоненциального скользящего среднего"
+        },
+        "signalperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 50,
+          "default": 9,
+          "description": "Период сигнальной линии"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "macd": {
+          "type": "number",
+          "description": "Значение линии MACD"
+        },
+        "signal": {
+          "type": "number",
+          "description": "Значение сигнальной линии"
+        },
+        "hist": {
+          "type": "number",
+          "description": "Значение гистограммы MACD"
+        }
+      }
+    },
+    "key_template": "{name}_fastperiod_{fastperiod}_signalperiod_{signalperiod}_slowperiod_{slowperiod}_{output_key}",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "bar-chart-2",
+      "color": "#4CAF50",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Периоды скользящих средних",
+          "parameters": ["fastperiod", "slowperiod"]
+        },
+        {
+          "name": "Сигнальная линия",
+          "parameters": ["signalperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "adx",
+    "display_name": "Average Directional Movement Index",
+    "description": "Индекс среднего направленного движения измеряет силу тренда без учета его направления. Значения выше 25 обычно указывают на сильный тренд, ниже 20 - на слабый тренд или боковое движение.",
+    "category": "trend",
+    "complexity": "intermediate",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 50,
+          "default": 14,
+          "description": "Период для расчета ADX"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение индекса ADX (0-100)",
+          "range": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "trending-up",
+      "color": "#FF5722",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "supertrend",
+    "display_name": "SuperTrend",
+    "description": "SuperTrend - это индикатор следования за трендом, который использует Average True Range (ATR) для вычисления динамических уровней поддержки и сопротивления. Показывает направление тренда и потенциальные точки входа/выхода.",
+    "category": "trend",
+    "complexity": "advanced",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["length", "multiplier"],
+      "properties": {
+        "length": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 50,
+          "default": 10,
+          "description": "Период для расчета ATR"
+        },
+        "multiplier": {
+          "type": "number",
+          "minimum": 1.0,
+          "maximum": 10.0,
+          "default": 3.0,
+          "description": "Множитель ATR для расчета полос SuperTrend"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "trend": {
+          "type": "number",
+          "description": "Текущее значение линии тренда SuperTrend"
+        },
+        "direction": {
+          "type": "number",
+          "description": "Направление тренда (1 для бычьего, -1 для медвежьего)"
+        },
+        "long": {
+          "type": "number",
+          "description": "Значение верхней полосы SuperTrend (для длинных позиций)"
+        },
+        "short": {
+          "type": "number",
+          "description": "Значение нижней полосы SuperTrend (для коротких позиций)"
+        }
+      }
+    },
+    "key_template": "{name}_length_{length}_multiplier_{multiplier}_{output_key}",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "arrow-up-circle",
+      "color": "#E91E63",
+      "chart_type": "overlay",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["length", "multiplier"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "bbands",
+    "display_name": "Bollinger Bands",
+    "description": "Полосы Боллинджера состоят из центральной линии (скользящее среднее) и двух полос, расположенных на определенном расстоянии от нее. Используются для определения уровней перекупленности/перепроданности и волатильности.",
+    "category": "volatility",
+    "complexity": "intermediate",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod", "nbdevup", "nbdevdn"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 100,
+          "default": 20,
+          "description": "Период скользящего среднего"
+        },
+        "nbdevup": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 5.0,
+          "default": 2.0,
+          "description": "Количество стандартных отклонений для верхней полосы"
+        },
+        "nbdevdn": {
+          "type": "number",
+          "minimum": 0.5,
+          "maximum": 5.0,
+          "default": 2.0,
+          "description": "Количество стандартных отклонений для нижней полосы"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "upper": {
+          "type": "number",
+          "description": "Верхняя полоса Боллинджера"
+        },
+        "middle": {
+          "type": "number",
+          "description": "Средняя линия (скользящее среднее)"
+        },
+        "lower": {
+          "type": "number",
+          "description": "Нижняя полоса Боллинджера"
+        }
+      }
+    },
+    "key_template": "{name}_nbdevdn_{nbdevdn}_nbdevup_{nbdevup}_timeperiod_{timeperiod}_{output_key}",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "layers",
+      "color": "#607D8B",
+      "chart_type": "overlay",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        },
+        {
+          "name": "Стандартные отклонения",
+          "parameters": ["nbdevup", "nbdevdn"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "atr",
+    "display_name": "Average True Range",
+    "description": "Средний истинный диапазон измеряет волатильность рынка. Не показывает направление цены, а только степень ценовой активности. Используется для установки стоп-лоссов и определения размера позиции.",
+    "category": "volatility",
+    "complexity": "basic",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 50,
+          "default": 14,
+          "description": "Период для расчета ATR"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение среднего истинного диапазона",
+          "range": {
+            "min": 0
+          }
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "bar-chart",
+      "color": "#795548",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "stoch",
+    "display_name": "Stochastic Oscillator",
+    "description": "Стохастический осциллятор сравнивает цену закрытия актива с диапазоном его цен за определенный период времени. Состоит из двух линий: %K и %D. Используется для определения моментума и потенциальных точек разворота.",
+    "category": "momentum",
+    "complexity": "intermediate",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["fastk_period", "slowk_period", "slowd_period"],
+      "properties": {
+        "fastk_period": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 50,
+          "default": 14,
+          "description": "Период для расчета %K"
+        },
+        "slowk_period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 3,
+          "description": "Период сглаживания %K"
+        },
+        "slowd_period": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 20,
+          "default": 3,
+          "description": "Период для расчета %D"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "k": {
+          "type": "number",
+          "description": "Значение стохастика %K (0-100)",
+          "range": {
+            "min": 0,
+            "max": 100
+          }
+        },
+        "d": {
+          "type": "number",
+          "description": "Значение стохастика %D (0-100)",
+          "range": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    "key_template": "{name}_fastk_period_{fastk_period}_slowd_period_{slowd_period}_slowk_period_{slowk_period}_{output_key}",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "activity",
+      "color": "#3F51B5",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные периоды",
+          "parameters": ["fastk_period"]
+        },
+        {
+          "name": "Сглаживание",
+          "parameters": ["slowk_period", "slowd_period"]
+        }
+      ]
+    }
+  },
+  {
+    "name": "mfi",
+    "display_name": "Money Flow Index",
+    "description": "Индекс денежного потока использует и цену, и объем для измерения давления покупки и продажи. Подобен RSI, но учитывает объем торгов. 0-20 считается зоной перепроданности, 80-100 - перекупленности.",
+    "category": "volume",
+    "complexity": "intermediate",
+    "parameters_schema": {
+      "type": "object",
+      "required": ["timeperiod"],
+      "properties": {
+        "timeperiod": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 50,
+          "default": 14,
+          "description": "Период для расчета MFI"
+        }
+      }
+    },
+    "output_schema": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number",
+          "description": "Значение индекса денежного потока (0-100)",
+          "range": {
+            "min": 0,
+            "max": 100
+          }
+        }
+      }
+    },
+    "key_template": "{name}_timeperiod_{timeperiod}_value",
+    "is_enabled": true,
+    "frontend_config": {
+      "icon": "dollar-sign",
+      "color": "#00BCD4",
+      "chart_type": "line",
+      "parameter_groups": [
+        {
+          "name": "Основные параметры",
+          "parameters": ["timeperiod"]
+        }
+      ]
+    }
+  }
+]
